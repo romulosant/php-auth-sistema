@@ -9,7 +9,7 @@ if (!isset($_SESSION['usuario'])) {
 
 // 2. Verifica se o usuário é ADMIN
 // IMPORTANTE: Verifique se no login você usou 'type' ou 'tipo'
-if (!isset($_SESSION['tipo']) || $_SESSION['tipo'] !== "user") {
+if (!isset($_SESSION['tipo']) || $_SESSION['tipo'] !== "admin") {
     header("Location: index.php");
     exit;
 }

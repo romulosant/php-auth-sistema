@@ -1,30 +1,38 @@
 <?php
 session_start();
+require "../storage/data.php";
 
 $erro = null;
-$sucesso = null;
+$sucesso = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $username = $_POST['usuario'] ?? '';
     $password = $_POST['senha'] ?? '';
 
-    if (empty($username) || empty($password)) {
+    $usuarioEncontrado = null;
 
-        $erro = "Preencha todos os campos!";
-
+    // 1. Primeiro percorre a lista toda para procurar o usuário
+    foreach ($users as $user) {
+        if ($username === $user['name'] && $password === $user['password']) {
+            $usuarioEncontrado = $user;
+            break; // Achou? Para o loop.
+        }
     }
-    elseif ($username === "admin" && $password === "123") {
 
-        $_SESSION['usuario'] = $username;
-        header("Location: dashboard.php");
-        die();
+    // 2. Só depois do loop verificamos se algo foi encontrado
+    if ($usuarioEncontrado) {
+        $_SESSION['usuario'] = $usuarioEncontrado['name'];
+        $_SESSION['tipo'] = $usuarioEncontrado['type'];
 
-    }
-    else {
-
-        $erro = "Login e senha incorretos!";
-
+        // Redirecionamento baseado no tipo
+        if ($usuarioEncontrado['type'] === 'admin') {
+            header('Location: admin.php');
+        } else {
+            header('Location: dashboard.php');
+        }
+        exit;
+    } else {
+        $erro = "Usuário ou senha incorretos!";
     }
 }
 
@@ -58,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- MENSAGEM DE SUCESSO -->
     <?php if ($sucesso): ?>
         <div class="mb-4 p-3 rounded bg-green-100 text-green-700 text-sm">
-            <?= htmlspecialchars($sucesso) ?>
+            <?= htmlspecialchars($sucesso) ?? null ?>
         </div>
     <?php endif; ?>
 
